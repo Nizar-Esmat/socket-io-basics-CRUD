@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Posts · Live CRUD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+
+  <!-- ── Navbar ── -->
+  <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">⚡</span>
+      <span class="text-xl font-bold tracking-tight">Live<span class="text-indigo-400">Posts</span></span>
+    </div>
+    <div id="conn-badge"
+      class="flex items-center gap-2 text-sm px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
+      <span id="conn-dot" class="w-2 h-2 rounded-full bg-red-500 transition-colors duration-300"></span>
+      <span id="conn-label">Disconnected</span>
+    </div>
+  </nav>
+
+  <!-- ── Toast container ── -->
+  <div id="toasts" class="fixed top-20 right-4 z-50 flex flex-col gap-2 w-72 pointer-events-none"></div>
+
+  <!-- ── Layout ── -->
+  <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-6">
+
+    <!-- ── Sidebar: Create form ── -->
+    <aside class="w-full lg:w-80 shrink-0">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sticky top-24">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span class="text-indigo-400">＋</span> New Post
+        </h2>
+        <form id="create-form" class="flex flex-col gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Title</label>
+            <input id="new-title" type="text" placeholder="Enter title…"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Content</label>
+            <textarea id="new-content" rows="4" placeholder="Write something…"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500 resize-none"></textarea>
+          </div>
+          <button type="submit"
+            class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all rounded-lg py-2 text-sm font-semibold">
+            Create Post
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- ── Main: Search + Posts ── -->
+    <main class="flex-1 min-w-0">
+      <!-- Search -->
+      <div class="relative mb-6">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-base">🔍</span>
+        <input id="search-input" type="text" placeholder="Search posts…"
+          class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500" />
+      </div>
+
+      <!-- Posts grid -->
+      <div id="posts-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- cards injected here -->
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden text-center text-slate-600 py-20">
+        <div class="text-5xl mb-3">📭</div>
+        <p class="text-sm">No posts yet. Create one!</p>
+      </div>
+
+      <!-- Loader -->
+      <div id="loader" class="flex justify-center py-16">
+        <svg class="animate-spin w-8 h-8 text-indigo-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+        </svg>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Edit Modal ── -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl mx-4">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <span class="text-yellow-400">✏️</span> Edit Post
+      </h2>
+      <form id="edit-form" class="flex flex-col gap-4">
+        <input id="edit-id" type="hidden" />
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Title</label>
+          <input id="edit-title" type="text"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Content</label>
+          <textarea id="edit-content" rows="4"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button type="button" id="cancel-edit"
+            class="px-4 py-2 rounded-lg text-sm bg-slate-800 hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit"
+            class="px-4 py-2 rounded-lg text-sm font-semibold bg-yellow-500 hover:bg-yellow-400 text-slate-900 transition active:scale-95">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Scripts ── -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
