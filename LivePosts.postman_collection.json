@@ -1,0 +1,185 @@
+{
+  "info": {
+    "_postman_id": "liveposts-socketio-crud",
+    "name": "LivePosts – Socket.IO CRUD",
+    "description": "Socket.IO events for the LivePosts real-time CRUD API.\n\n**Server:** http://localhost:3000\n\nEach request represents a Socket.IO event.\n- Set the connection URL to `http://localhost:3000`\n- Use the event name shown in each request\n- Paste the example body as the message data",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 – Get All Posts",
+      "request": {
+        "method": "SOCKETIO",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": { "language": "json" }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000"
+        },
+        "description": "**Emit event:** `getPosts`\n**Payload:** *(none)*\n\n**Listen for:** `posts`\n**Response:**\n```json\n[\n  { \"_id\": \"...\", \"title\": \"Hello\", \"content\": \"World\" }\n]\n```"
+      },
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "response": [
+        {
+          "name": "posts – example response",
+          "originalRequest": {
+            "method": "SOCKETIO",
+            "url": { "raw": "http://localhost:3000" }
+          },
+          "status": "OK",
+          "body": "[\n  {\n    \"_id\": \"6631a1f2e4b0a1c2d3e4f5a6\",\n    \"title\": \"First Post\",\n    \"content\": \"Hello from Socket.IO!\"\n  },\n  {\n    \"_id\": \"6631a1f2e4b0a1c2d3e4f5a7\",\n    \"title\": \"Second Post\",\n    \"content\": \"Real-time is awesome.\"\n  }\n]"
+        }
+      ]
+    },
+    {
+      "name": "2 – Create Post",
+      "request": {
+        "method": "SOCKETIO",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"My New Post\",\n  \"content\": \"This is the post content.\"\n}",
+          "options": {
+            "raw": { "language": "json" }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000"
+        },
+        "description": "**Emit event:** `createPost`\n**Payload:**\n```json\n{\n  \"title\": \"My New Post\",\n  \"content\": \"This is the post content.\"\n}\n```\n\n**Listen for:** `postCreated` (broadcast to all clients)\n**Response:**\n```json\n{\n  \"message\": \"post created successfully\",\n  \"post\": { \"_id\": \"...\", \"title\": \"My New Post\", \"content\": \"...\" }\n}\n```"
+      },
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "response": [
+        {
+          "name": "postCreated – example response",
+          "originalRequest": {
+            "method": "SOCKETIO",
+            "url": { "raw": "http://localhost:3000" }
+          },
+          "status": "OK",
+          "body": "{\n  \"message\": \"post created successfully\",\n  \"post\": {\n    \"_id\": \"6631a1f2e4b0a1c2d3e4f5a8\",\n    \"title\": \"My New Post\",\n    \"content\": \"This is the post content.\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "3 – Update Post",
+      "request": {
+        "method": "SOCKETIO",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"postId\": \"6631a1f2e4b0a1c2d3e4f5a8\",\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content goes here.\"\n}",
+          "options": {
+            "raw": { "language": "json" }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000"
+        },
+        "description": "**Emit event:** `updatePost`\n**Payload:**\n```json\n{\n  \"postId\": \"<MongoDB _id>\",\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content goes here.\"\n}\n```\n\n**Listen for:** `postUpdated` (broadcast to all clients)\n**Response:**\n```json\n{\n  \"message\": \"post updated successfully\",\n  \"postId\": \"...\",\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content goes here.\"\n}\n```"
+      },
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "response": [
+        {
+          "name": "postUpdated – example response",
+          "originalRequest": {
+            "method": "SOCKETIO",
+            "url": { "raw": "http://localhost:3000" }
+          },
+          "status": "OK",
+          "body": "{\n  \"message\": \"post updated successfully\",\n  \"postId\": \"6631a1f2e4b0a1c2d3e4f5a8\",\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content goes here.\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "4 – Delete Post",
+      "request": {
+        "method": "SOCKETIO",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "\"6631a1f2e4b0a1c2d3e4f5a8\"",
+          "options": {
+            "raw": { "language": "json" }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000"
+        },
+        "description": "**Emit event:** `deletePost`\n**Payload:** `\"<MongoDB _id>\"` *(plain string, the post _id)*\n\n**Listen for:** `postDeleted` (broadcast to all clients)\n**Response:**\n```json\n{\n  \"message\": \"post deleted successfully\",\n  \"postId\": \"...\"\n}\n```"
+      },
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "response": [
+        {
+          "name": "postDeleted – example response",
+          "originalRequest": {
+            "method": "SOCKETIO",
+            "url": { "raw": "http://localhost:3000" }
+          },
+          "status": "OK",
+          "body": "{\n  \"message\": \"post deleted successfully\",\n  \"postId\": \"6631a1f2e4b0a1c2d3e4f5a8\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "5 – Search Posts",
+      "request": {
+        "method": "SOCKETIO",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "\"hello\"",
+          "options": {
+            "raw": { "language": "json" }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000"
+        },
+        "description": "**Emit event:** `searchPosts`\n**Payload:** `\"<search term>\"` *(plain string)*\n\nSearches both `title` and `content` fields (case-insensitive regex).\n\n**Listen for:** `searchResults` (only sent back to the requesting socket)\n**Response:**\n```json\n[\n  { \"_id\": \"...\", \"title\": \"Hello World\", \"content\": \"...\" }\n]\n```"
+      },
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "response": [
+        {
+          "name": "searchResults – example response",
+          "originalRequest": {
+            "method": "SOCKETIO",
+            "url": { "raw": "http://localhost:3000" }
+          },
+          "status": "OK",
+          "body": "[\n  {\n    \"_id\": \"6631a1f2e4b0a1c2d3e4f5a6\",\n    \"title\": \"Hello World\",\n    \"content\": \"This matches the search term hello.\"\n  }\n]"
+        }
+      ]
+    }
+  ]
+}
